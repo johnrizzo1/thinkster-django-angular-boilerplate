@@ -27,6 +27,7 @@
             getAuthenticatedAccount: getAuthenticatedAccount,
             isAuthenticated: isAuthenticated,
             login: login,
+            logout: logout,
             register: register,
             setAuthenticatedAccount: setAuthenticatedAccount,
             unauthenticate: unauthenticate
@@ -41,14 +42,16 @@
          * @desc Try to register a new user
          * @param {string} email The email entered by the user
          * @param {string} password The password entered by the user
+         * @param {string} confirm_password The password entered by the user
          * @param {string} username The username entered by the user
          * @returns {Promise}
          * @memberOf thinkster.authentication.services.Authentication
          */
-        function register(email, password, username) {
+        function register(email, password, confirm_password, username) {
             return $http.post('/api/v1/accounts/', {
                 username: username,
                 password: password,
+                confirm_password: confirm_password,
                 email: email
             }).then(registerSuccessFn, registerErrorFn);
 
@@ -99,6 +102,35 @@
             function loginErrorFn(data, status, headers, config) {
                 console.error('Epic failure!');
             }
+        }
+
+        /**
+         * @name logout
+         * @desc Try to log the user out
+         * @returns {Promise}
+         * @memberOf thinkster.authentication.services.Authentication
+         */
+        function logout() {
+          return $http.post('/api/v1/auth/logout/')
+            .then(logoutSuccessFn, logoutErrorFn);
+
+          /**
+           * @name logoutSuccessFn
+           * @desc Unauthenticate and redirect to index with page reload
+           */
+          function logoutSuccessFn(data, status, headers, config) {
+            Authentication.unauthenticate();
+
+            window.location = '/';
+          }
+
+          /**
+           * @name logoutErrorFn
+           * @desc Log "Epic failure!" to the console
+           */
+          function logoutErrorFn(data, status, headers, config) {
+            console.error('Epic failure!');
+          }
         }
 
         /**
